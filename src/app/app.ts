@@ -1,27 +1,35 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed, model } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'test-component',
-  template: '<p>testing</p>',
+  selector: 'value-display',
+  template: '<p>{{label()}}</p> <button (click)="increment()">Click 2</button>',
 })
-class TestComponent {}
-
-@Component({
-  selector: 'basic-incrementing',
-  template: '<button tuiButton size="l" (click)="increment()">Click</button>',
-})
-export class BasicIncrementing {
-  value = signal(0);
+export class ValueDisplay {
+  value = model.required<number>();
+  label = computed(() => `Value: ${this.value()}`);
 
   increment() {
     this.value.update((value) => value + 1);
-    console.log(this.value());
   }
 }
 
 @Component({
-  imports: [RouterOutlet, TestComponent, BasicIncrementing],
+  selector: 'basic-increment-button',
+  template:
+    '<button type="button" (click)="increment()">Click</button> <br><value-display [(value)]="value"/>',
+  imports: [ValueDisplay],
+})
+export class BasicIncrementButton {
+  value = model<number>(0);
+
+  increment() {
+    this.value.update((value) => value + 1);
+  }
+}
+
+@Component({
+  imports: [RouterOutlet, BasicIncrementButton],
   selector: 'app-root',
   templateUrl: './app.html',
 })
